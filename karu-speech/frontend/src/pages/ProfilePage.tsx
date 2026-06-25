@@ -1,4 +1,4 @@
-import { User, Settings, BarChart3, Clock, Award, Mic, LogIn } from 'lucide-react'
+import { User, BarChart3, Clock, Award, Mic, LogIn } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 

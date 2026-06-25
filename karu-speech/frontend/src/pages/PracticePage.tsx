@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
-import { ArrowLeft, Clock, Mic, CheckCircle, Play, Loader2, BookOpen, Headphones, Radio, Sparkles } from 'lucide-react'
+import { ArrowLeft, Clock, CheckCircle, Loader2, BookOpen, Headphones, Radio, Sparkles } from 'lucide-react'
 import api from '../lib/api'
 import { AudioRecorder } from '../components/AudioRecorder'
 

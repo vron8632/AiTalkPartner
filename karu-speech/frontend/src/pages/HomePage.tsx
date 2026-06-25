@@ -91,8 +91,7 @@ export function HomePage() {
               </div>
 
               <div className="space-y-2">
-                {levelLessons.map((lesson, idx) => {
-                  const prevDone = idx === 0 || levelLessons[idx - 1].progress_status === 'completed'
+                {levelLessons.map((lesson) => {
                   const isLocked = lesson.progress_status === 'locked'
                   const isCompleted = lesson.progress_status === 'completed'
                   const canAccess = !isLocked

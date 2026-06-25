@@ -41,7 +41,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'frontend_dist'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -82,6 +82,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [BASE_DIR / 'frontend_dist']
 
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -111,7 +112,7 @@ BAIDU_SECRET_KEY = os.getenv('BAIDU_SECRET_KEY', '')
 
 SIMPLEUI_HOME_INFO = False
 SIMPLEUI_ANALYSIS = False
-SIMPLEUI_INDEX = 'https://192.168.1.124:5173/'
+SIMPLEUI_INDEX = '/'
 SIMPLEUI_LOGO = 'https://img.icons8.com/fluency/96/microphone.png'
 SIMPLEUI_CONFIG = {
     'system_keep': True,
@@ -119,7 +120,7 @@ SIMPLEUI_CONFIG = {
         {
             'name': '返回前台',
             'icon': 'fas fa-external-link-alt',
-            'url': 'https://192.168.1.124:5173/',
+            'url': '/',
         },
     ],
 }

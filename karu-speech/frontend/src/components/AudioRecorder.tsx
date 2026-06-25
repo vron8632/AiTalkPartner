@@ -11,7 +11,7 @@ export function AudioRecorder({ onUploaded, lessonId }: AudioRecorderProps) {
   const [duration, setDuration] = useState(0)
   const mediaRecorder = useRef<MediaRecorder | null>(null)
   const chunks = useRef<Blob[]>([])
-  const timer = useRef<ReturnType<typeof setInterval>>()
+  const timer = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const start = useCallback(async () => {
     try {
@@ -23,14 +23,14 @@ export function AudioRecorder({ onUploaded, lessonId }: AudioRecorderProps) {
       mediaRecorder.current.start()
       setState('recording')
       setDuration(0)
-      timer.current = setInterval(() => setDuration(d => d + 1), 1000)
+      timer.current = window.setInterval(() => setDuration(d => d + 1), 1000)
     } catch {
       alert('无法访问麦克风，请检查权限设置')
     }
   }, [])
 
   const stop = useCallback(() => {
-    clearInterval(timer.current)
+    if (timer.current !== null) window.clearInterval(timer.current)
     mediaRecorder.current?.stop()
     mediaRecorder.current?.stream.getTracks().forEach(t => t.stop())
     setState('uploading')
