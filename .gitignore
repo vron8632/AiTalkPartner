@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+*.pyo
+*.db
+*.sqlite3
+.env
+node_modules/
+dist/
+.vite/
+/media/
+cert/
+*.pem
+*.log
+.DS_Store
+github信息.txt
+*.wav
+*.webm
