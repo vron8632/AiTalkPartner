@@ -16,10 +16,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <header className="sticky top-0 z-50 bg-primary shadow-lg">
         <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 text-white">
-            <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center text-primary font-bold text-sm">
-              K
-            </div>
-            <span className="font-bold text-base">卡耐基魅力演说</span>
+            <img
+              src="/favicon.jpeg"
+              alt="logo"
+              className="w-8 h-8 rounded-lg object-cover bg-white"
+            />
+            <span className="font-bold text-base">宇涵智能演说</span>
           </Link>
 
           <div className="flex items-center gap-1">

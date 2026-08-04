@@ -7,7 +7,7 @@ from django.conf import settings
 for k in ['http_proxy', 'https_proxy', 'HTTP_PROXY', 'HTTPS_PROXY', 'all_proxy', 'ALL_PROXY']:
     os.environ.pop(k, None)
 
-PROMPT_TEMPLATE = """你是一位卡耐基魅力演说教练。请从以下维度评价用户的演讲内容（0-100分）：
+PROMPT_TEMPLATE = """你是一位宇涵智能演说教练。请从以下维度评价用户的演讲内容（0-100分）：
 
 1. **自信度**（Confidence）：语气是否坚定，是否有犹豫/自我否定/填充词过多
 2. **结构清晰度**（Structure）：是否有开头-主体-结尾的黄金结构

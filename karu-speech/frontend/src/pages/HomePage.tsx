@@ -51,7 +51,7 @@ export function HomePage() {
       <div className="text-center mb-10 pt-4 md:pt-8">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-accent/10 text-accent-dark rounded-full text-sm font-medium mb-4">
           <Sparkles size={14} />
-          卡耐基经典五阶训练法
+          宇涵智能五阶训练法
         </div>
         <h2 className="text-3xl md:text-4xl font-bold text-primary">
           让你的声音被世界听见

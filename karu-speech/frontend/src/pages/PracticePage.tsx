@@ -32,10 +32,24 @@ export function PracticePage() {
   const [exampleRec, setExampleRec] = useState<{ id: number; url: string } | null>(null)
   const [practiceRec, setPracticeRec] = useState<{ id: number; url: string } | null>(null)
   const [evaluating, setEvaluating] = useState(false)
+  const [exampleMode, setExampleMode] = useState<'预制' | '自行输入' | 'AI生成'>('预制')
+  const [customText, setCustomText] = useState('')
+  const [generatedText, setGeneratedText] = useState('')
+  const [generating, setGenerating] = useState(false)
 
   useEffect(() => {
     api.get(`/lessons/${lessonId}/`).then(r => setLesson(r.data)).catch(() => {})
   }, [lessonId])
+
+  const handleGenerate = async () => {
+    if (!lesson || generating) return
+    setGenerating(true)
+    try {
+      const r = await api.post(`/lessons/${lesson.id}/generate-example/`)
+      setGeneratedText(r.data.example_text)
+    } catch { alert('生成失败，请稍后重试') }
+    finally { setGenerating(false) }
+  }
 
   const handleEvaluate = async () => {
     if (!practiceRec) return
@@ -123,27 +137,61 @@ export function PracticePage() {
               <Headphones size={18} className="text-primary" />
               <h3 className="font-bold text-text">范例跟读</h3>
             </div>
-            <p className="text-xs text-text-muted mb-3">看着文本大声朗读，录下自己的声音，感受表达的节奏。</p>
-            <div className="bg-background rounded-lg p-4 text-sm text-text leading-relaxed whitespace-pre-wrap border border-border mb-4 max-h-60 overflow-y-auto">
-              {lesson.example_text || '暂无范例文本。'}
+
+            {/* 文本来源选择 */}
+            <div className="flex gap-1 bg-background rounded-lg p-1 mb-3">
+              {(['预制', '自行输入', 'AI生成'] as const).map(m => (
+                <button key={m} onClick={() => { setExampleMode(m); setCustomText(''); setGenerating(false) }}
+                  className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-colors ${exampleMode === m ? 'bg-white text-primary shadow-sm' : 'text-text-muted'}`}>
+                  {m}
+                </button>
+              ))}
             </div>
+
+            {exampleMode === '预制' && (
+              <div className="bg-background rounded-lg p-4 text-sm text-text leading-relaxed whitespace-pre-wrap border border-border mb-4 max-h-60 overflow-y-auto">
+                {lesson.example_text || '暂无预制范例，请选择其他方式。'}
+              </div>
+            )}
+
+            {exampleMode === '自行输入' && (
+              <textarea value={customText} onChange={e => setCustomText(e.target.value)}
+                placeholder="在此输入你的演讲稿..."
+                className="w-full h-40 bg-background rounded-lg p-4 text-sm text-text border border-border resize-none focus:outline-none focus:ring-2 focus:ring-primary/20 mb-4" />
+            )}
+
+            {exampleMode === 'AI生成' && (
+              <div className="mb-4">
+                {generating ? (
+                  <div className="flex items-center justify-center gap-2 py-10 text-sm text-text-muted">
+                    <Loader2 size={16} className="animate-spin" /> AI生成中...
+                  </div>
+                ) : generatedText ? (
+                  <div className="bg-background rounded-lg p-4 text-sm text-text leading-relaxed whitespace-pre-wrap border border-border max-h-60 overflow-y-auto">
+                    {generatedText}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-sm text-text-muted mb-3">点击按钮，AI将根据课程内容生成一篇范例</p>
+                    <button onClick={handleGenerate} className="px-5 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-light transition-colors">
+                      AI生成范例
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
 
             {exampleRec ? (
               <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center mb-4">
                 <CheckCircle size={24} className="mx-auto text-green-500 mb-1" />
                 <p className="text-sm text-green-700 font-medium">跟读录音完成</p>
                 <audio src={exampleRec.url} controls className="w-full mt-2 h-9" />
-                <button onClick={() => setExampleRec(null)} className="mt-2 text-xs text-text-muted hover:text-text underline">
-                  重新录制
-                </button>
+                <button onClick={() => setExampleRec(null)} className="mt-2 text-xs text-text-muted hover:text-text underline">重新录制</button>
               </div>
             ) : (
               <div className="border border-dashed border-border rounded-lg p-4 mb-4">
-                <p className="text-xs text-text-muted text-center mb-3">点击下方按钮，朗读上面的范例文本</p>
-                <AudioRecorder
-                  lessonId={lesson.id}
-                  onUploaded={(id, url) => setExampleRec({ id, url })}
-                />
+                <p className="text-xs text-text-muted text-center mb-3">朗读文本并录音</p>
+                <AudioRecorder lessonId={lesson.id} onUploaded={(id, url) => setExampleRec({ id, url })} />
               </div>
             )}
 

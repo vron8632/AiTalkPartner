@@ -84,7 +84,7 @@ STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'frontend_dist']
 
-MEDIA_URL = 'media/'
+MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -113,7 +113,7 @@ BAIDU_SECRET_KEY = os.getenv('BAIDU_SECRET_KEY', '')
 SIMPLEUI_HOME_INFO = False
 SIMPLEUI_ANALYSIS = False
 SIMPLEUI_INDEX = '/'
-SIMPLEUI_LOGO = 'https://img.icons8.com/fluency/96/microphone.png'
+SIMPLEUI_LOGO = '/static/favicon.jpeg'
 SIMPLEUI_CONFIG = {
     'system_keep': True,
     'menus': [

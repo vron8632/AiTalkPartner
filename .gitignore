@@ -15,3 +15,7 @@ cert/
 github信息.txt
 *.wav
 *.webm
+.agents/
+.reasonix/
+reasonix.toml
+skills-lock.json
