@@ -19,6 +19,7 @@ interface RegisterData {
   email: string
   password: string
   nickname: string
+  emailVerifyCode: string
 }
 
 interface AuthContextType {
@@ -26,6 +27,7 @@ interface AuthContextType {
   token: string | null
   login: (username: string, password: string) => Promise<void>
   register: (data: RegisterData) => Promise<void>
+  loginWithToken: (access: string) => Promise<void>
   refreshUser: () => Promise<void>
   logout: () => void
   loading: boolean
@@ -48,8 +50,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (username: string, password: string) => {
     const r = await api.post('/auth/jwt/create/', { username, password })
-    localStorage.setItem('token', r.data.access)
-    setToken(r.data.access)
+    await loginWithToken(r.data.access)
+  }
+
+  const loginWithToken = async (access: string) => {
+    localStorage.setItem('token', access)
+    setToken(access)
     const me = await api.get('/auth/users/me/')
     setUser(me.data)
   }
@@ -61,6 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       password: data.password,
       re_password: data.password,
       nickname: data.nickname,
+      email_verify_code: data.emailVerifyCode,
     })
   }
 
@@ -76,7 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, login, register, refreshUser, logout, loading }}>
+    <AuthContext.Provider value={{ user, token, login, register, loginWithToken, refreshUser, logout, loading }}>
       {children}
     </AuthContext.Provider>
   )

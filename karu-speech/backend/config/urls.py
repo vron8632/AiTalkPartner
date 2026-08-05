@@ -15,6 +15,7 @@ urlpatterns = [
     path('api/', include('lessons.urls')),
     path('api/practice/', include('practice.urls')),
     path('api/payment/', include('payment.urls')),
+    path('api/e_mail/', include('e_mail.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # Serve frontend build assets

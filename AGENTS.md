@@ -10,6 +10,7 @@
 - API：DRF 书写，符合 RESTful 规范（资源操作用 ViewSet；动作类接口如上传/评价可用自定义端点）
 - 认证：**JWT** — djangorestframework-simplejwt（Bearer token，`/api/auth/jwt/create|refresh/`）
 - 用户模块：**djoser** 完成用户注册登录（账号/密码/邮箱/昵称），`/api/auth/users/` 注册、`/api/auth/users/me/` 当前用户；保留 `/api/auth/login/` 旧手机号登录兼容
+- 邮箱验证：**e_mail** 应用 — 邮箱验证码（2分钟有效）注册/登录/改密/找回密码，SMTP 参数存 `e_mail` 表、后台「邮箱配置」管理，接口 `/api/e_mail/send-code|login|change-password|reset-password/`
 
 ## 协作规则
 

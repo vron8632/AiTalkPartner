@@ -48,6 +48,50 @@ export function ProfilePage() {
   const [savingNick, setSavingNick] = useState(false)
   const [uploadingAvatar, setUploadingAvatar] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
+  const [pwdCode, setPwdCode] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [reNewPassword, setReNewPassword] = useState('')
+  const [pwdError, setPwdError] = useState('')
+  const [pwdCountdown, setPwdCountdown] = useState(0)
+  const [savingPwd, setSavingPwd] = useState(false)
+  const pwdTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  useEffect(() => () => { if (pwdTimerRef.current) clearInterval(pwdTimerRef.current) }, [])
+
+  const handleSendPwdCode = async () => {
+    setPwdError('')
+    if (!user?.email) { setPwdError('当前账号未绑定邮箱'); return }
+    try {
+      await api.post('/e_mail/send-code/', { email: user.email, purpose: 'change_password' })
+      setPwdCountdown(60)
+      pwdTimerRef.current = setInterval(() => {
+        setPwdCountdown(c => {
+          if (c <= 1 && pwdTimerRef.current) clearInterval(pwdTimerRef.current)
+          return c - 1
+        })
+      }, 1000)
+      alert('验证码已发送，请查收邮箱（2分钟内有效）')
+    } catch (e: any) {
+      setPwdError(e?.response?.data?.detail || '验证码发送失败')
+    }
+  }
+
+  const handleChangePassword = async () => {
+    setPwdError('')
+    if (!pwdCode) { setPwdError('请输入验证码'); return }
+    if (newPassword.length < 6) { setPwdError('新密码至少 6 位'); return }
+    if (newPassword !== reNewPassword) { setPwdError('两次输入的密码不一致'); return }
+    try {
+      setSavingPwd(true)
+      await api.post('/e_mail/change-password/', { code: pwdCode, new_password: newPassword })
+      setPwdCode(''); setNewPassword(''); setReNewPassword('')
+      alert('密码修改成功')
+    } catch (e: any) {
+      setPwdError(e?.response?.data?.detail || '修改失败，请稍后重试')
+    } finally {
+      setSavingPwd(false)
+    }
+  }
 
   useEffect(() => {
     if (!user) { setLoading(false); return }
@@ -264,6 +308,43 @@ export function ProfilePage() {
             })}
           </div>
         )}
+
+        <h3 className="font-bold text-text mb-3 mt-8">账号安全</h3>
+        <div className="bg-surface rounded-xl border border-border p-5 shadow-sm">
+          {!user.email ? (
+            <p className="text-sm text-text-muted">当前账号未绑定邮箱，暂无法通过邮箱验证码修改密码。</p>
+          ) : (
+            <div className="space-y-4">
+              <div className="text-sm text-text-muted">通过邮箱验证码修改密码（验证码发送至 <span className="text-text">{user.email}</span>）</div>
+              <div className="flex gap-2">
+                <input
+                  type="text" placeholder="请输入邮箱验证码" maxLength={6}
+                  value={pwdCode} onChange={e => setPwdCode(e.target.value.replace(/\D/g, ''))}
+                  className="flex-1 px-4 py-2.5 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                />
+                <button onClick={handleSendPwdCode} disabled={pwdCountdown > 0}
+                  className="shrink-0 px-3 py-2 bg-primary/10 text-primary rounded-lg text-xs font-medium hover:bg-primary/20 disabled:opacity-50">
+                  {pwdCountdown > 0 ? `${pwdCountdown}s` : '获取验证码'}
+                </button>
+              </div>
+              <input
+                type="password" placeholder="新密码（至少6位）"
+                value={newPassword} onChange={e => setNewPassword(e.target.value)}
+                className="w-full px-4 py-2.5 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+              />
+              <input
+                type="password" placeholder="确认新密码"
+                value={reNewPassword} onChange={e => setReNewPassword(e.target.value)}
+                className="w-full px-4 py-2.5 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+              />
+              {pwdError && <p className="text-red-500 text-xs">{pwdError}</p>}
+              <button onClick={handleChangePassword} disabled={savingPwd}
+                className="w-full py-2.5 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-light transition-colors disabled:opacity-50">
+                {savingPwd ? '提交中...' : '确认修改'}
+              </button>
+            </div>
+          )}
+        </div>
       </>
     )}
     </div>
