@@ -10,6 +10,8 @@ interface User {
   phone: string | null
   is_member: boolean
   member_expire: string | null
+  is_staff: boolean
+  is_superuser: boolean
 }
 
 interface RegisterData {
@@ -24,6 +26,7 @@ interface AuthContextType {
   token: string | null
   login: (username: string, password: string) => Promise<void>
   register: (data: RegisterData) => Promise<void>
+  refreshUser: () => Promise<void>
   logout: () => void
   loading: boolean
 }
@@ -61,6 +64,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     })
   }
 
+  const refreshUser = async () => {
+    const me = await api.get('/auth/users/me/')
+    setUser(me.data)
+  }
+
   const logout = () => {
     localStorage.removeItem('token')
     setToken(null)
@@ -68,7 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, login, register, logout, loading }}>
+    <AuthContext.Provider value={{ user, token, login, register, refreshUser, logout, loading }}>
       {children}
     </AuthContext.Provider>
   )

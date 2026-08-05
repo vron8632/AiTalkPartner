@@ -47,12 +47,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
               </button>
             )}
 
-            <a href="/admin/" target="_blank" rel="noopener noreferrer"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-white/50 hover:text-white hover:bg-white/10 transition-colors ml-1 border-l border-white/10 pl-3"
-            >
-              <Shield size={14} />
-              <span className="hidden sm:inline">后台管理</span>
-            </a>
+            {(user?.is_staff || user?.is_superuser) && (
+              <a href="/admin/" target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-white/50 hover:text-white hover:bg-white/10 transition-colors ml-1 border-l border-white/10 pl-3"
+              >
+                <Shield size={14} />
+                <span className="hidden sm:inline">后台管理</span>
+              </a>
+            )}
           </div>
         </div>
       </header>

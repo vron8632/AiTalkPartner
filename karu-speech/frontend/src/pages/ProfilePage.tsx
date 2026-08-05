@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { User, BarChart3, Clock, Award, Mic, LogIn, ChevronRight, Star } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { User, BarChart3, Clock, Award, Mic, LogIn, ChevronRight, Star, Camera, Pencil, Loader2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import api from '../lib/api'
 import { useAuth } from '../hooks/useAuth'
@@ -16,9 +16,14 @@ interface PracticeItem {
 }
 
 export function ProfilePage() {
-  const { user } = useAuth()
+  const { user, refreshUser } = useAuth()
   const [records, setRecords] = useState<PracticeItem[]>([])
   const [loading, setLoading] = useState(true)
+  const [editingNick, setEditingNick] = useState(false)
+  const [nickInput, setNickInput] = useState('')
+  const [savingNick, setSavingNick] = useState(false)
+  const [uploadingAvatar, setUploadingAvatar] = useState(false)
+  const fileRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (!user) { setLoading(false); return }
@@ -27,6 +32,44 @@ export function ProfilePage() {
       setRecords(data)
     }).catch(() => {}).finally(() => setLoading(false))
   }, [user])
+
+  const startEditNick = () => {
+    setNickInput(user?.nickname || '')
+    setEditingNick(true)
+  }
+
+  const saveNick = async () => {
+    if (!user) return
+    const nickname = nickInput.trim()
+    if (!nickname) { alert('昵称不能为空'); return }
+    try {
+      setSavingNick(true)
+      await api.patch('/auth/users/me/', { nickname })
+      await refreshUser()
+      setEditingNick(false)
+    } catch {
+      alert('保存失败，请稍后重试')
+    } finally {
+      setSavingNick(false)
+    }
+  }
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const form = new FormData()
+    form.append('file', file)
+    try {
+      setUploadingAvatar(true)
+      await api.post('/auth/avatar/', form)
+      await refreshUser()
+    } catch {
+      alert('头像上传失败，请重试')
+    } finally {
+      setUploadingAvatar(false)
+      if (fileRef.current) fileRef.current.value = ''
+    }
+  }
 
   const totalPractices = records.length
   const totalDuration = records.reduce((s, r) => s + (r.duration_sec || 0), 0)
@@ -56,11 +99,48 @@ export function ProfilePage() {
     <div>
       <div className="bg-surface rounded-xl border border-border p-6 mb-6 shadow-sm">
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 bg-primary/5 rounded-full flex items-center justify-center border-2 border-primary/10">
-            <User size={32} className="text-primary" />
+          <div className="relative">
+            <button
+              onClick={() => fileRef.current?.click()}
+              disabled={uploadingAvatar}
+              className="w-16 h-16 rounded-full overflow-hidden flex items-center justify-center border-2 border-primary/10 bg-primary/5 hover:opacity-80 transition-opacity"
+              title="点击更换头像"
+            >
+              {user.avatar_url ? (
+                <img src={user.avatar_url} alt="头像" className="w-full h-full object-cover" />
+              ) : (
+                <User size={32} className="text-primary" />
+              )}
+              {uploadingAvatar && <Loader2 size={20} className="absolute text-white animate-spin" />}
+            </button>
+            <span className="absolute bottom-0 right-0 w-6 h-6 bg-primary rounded-full flex items-center justify-center text-white shadow">
+              <Camera size={12} />
+            </span>
+            <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/gif,image/webp" className="hidden" onChange={handleAvatarChange} />
           </div>
           <div className="flex-1">
-            <h2 className="text-xl font-bold text-text">{user.nickname || user.username}</h2>
+            {editingNick ? (
+              <div className="flex items-center gap-2">
+                <input
+                  value={nickInput}
+                  onChange={e => setNickInput(e.target.value)}
+                  maxLength={20}
+                  autoFocus
+                  className="px-3 py-1.5 bg-background border border-border rounded-lg text-lg font-bold text-text focus:outline-none focus:ring-2 focus:ring-primary/20"
+                />
+                <button onClick={saveNick} disabled={savingNick} className="px-3 py-1.5 bg-primary text-white rounded-lg text-xs font-medium disabled:opacity-50">
+                  {savingNick ? '保存中' : '保存'}
+                </button>
+                <button onClick={() => setEditingNick(false)} className="px-3 py-1.5 border border-border rounded-lg text-xs text-text-muted">取消</button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <h2 className="text-xl font-bold text-text">{user.nickname || user.username}</h2>
+                <button onClick={startEditNick} className="text-text-muted hover:text-text transition-colors" title="修改昵称">
+                  <Pencil size={14} />
+                </button>
+              </div>
+            )}
             <p className="text-sm text-text-muted">
               {user.is_member ? '🎯 会员' : '📖 免费用户'}
               {user.phone && ` · ${user.phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2')}`}

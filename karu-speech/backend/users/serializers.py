@@ -5,9 +5,13 @@ from users.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
+    is_staff = serializers.BooleanField(read_only=True)
+    is_superuser = serializers.BooleanField(read_only=True)
+
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'nickname', 'avatar_url', 'phone', 'is_member', 'member_expire']
+        fields = ['id', 'username', 'email', 'nickname', 'avatar_url', 'phone', 'is_member', 'member_expire', 'is_staff', 'is_superuser']
+        read_only_fields = ['username', 'email', 'phone', 'is_member', 'member_expire']
 
 
 class UserCreateSerializer(BaseUserCreateSerializer):
