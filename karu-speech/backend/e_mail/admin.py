@@ -20,6 +20,18 @@ class EmailConfigAdmin(admin.ModelAdmin):
 
 @admin.register(EmailVerifyCode)
 class EmailVerifyCodeAdmin(admin.ModelAdmin):
+    """邮箱验证码日志（只读，不需要新增/删除）。"""
     list_display = ['email', 'code', 'purpose', 'used', 'expires_at', 'created_at']
     list_filter = ['purpose', 'used']
     search_fields = ['email']
+    ordering = ['-created_at']
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        # 日志允许查看，但禁止修改内容
+        return False
