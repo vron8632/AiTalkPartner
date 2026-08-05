@@ -54,6 +54,7 @@ export function ProfilePage() {
   const [pwdError, setPwdError] = useState('')
   const [pwdCountdown, setPwdCountdown] = useState(0)
   const [savingPwd, setSavingPwd] = useState(false)
+  const [showPwdForm, setShowPwdForm] = useState(false)
   const pwdTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   useEffect(() => () => { if (pwdTimerRef.current) clearInterval(pwdTimerRef.current) }, [])
@@ -314,7 +315,12 @@ export function ProfilePage() {
           {!user.email ? (
             <p className="text-sm text-text-muted">当前账号未绑定邮箱，暂无法通过邮箱验证码修改密码。</p>
           ) : (
-            <div className="space-y-4">
+            <>
+              <button onClick={() => setShowPwdForm(v => !v)} className="w-full py-2.5 bg-primary/10 text-primary rounded-lg text-sm font-medium hover:bg-primary/20 transition-colors">
+                {showPwdForm ? '收起修改密码' : '修改密码'}
+              </button>
+              {showPwdForm && (
+                <div className="space-y-4 mt-4">
               <div className="text-sm text-text-muted">通过邮箱验证码修改密码（验证码发送至 <span className="text-text">{user.email}</span>）</div>
               <div className="flex gap-2">
                 <input
@@ -342,7 +348,9 @@ export function ProfilePage() {
                 className="w-full py-2.5 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-light transition-colors disabled:opacity-50">
                 {savingPwd ? '提交中...' : '确认修改'}
               </button>
-            </div>
+                </div>
+              )}
+            </>
           )}
         </div>
       </>
