@@ -3,17 +3,27 @@ import api from '../lib/api'
 
 interface User {
   id: number
-  phone: string
+  username: string
+  email: string
   nickname: string | null
   avatar_url: string | null
+  phone: string | null
   is_member: boolean
   member_expire: string | null
+}
+
+interface RegisterData {
+  username: string
+  email: string
+  password: string
+  nickname: string
 }
 
 interface AuthContextType {
   user: User | null
   token: string | null
-  login: (phone: string) => Promise<void>
+  login: (username: string, password: string) => Promise<void>
+  register: (data: RegisterData) => Promise<void>
   logout: () => void
   loading: boolean
 }
@@ -27,18 +37,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!token) { setLoading(false); return }
-    api.get('/auth/me/')
+    api.get('/auth/users/me/')
       .then(r => setUser(r.data))
       .catch(() => { localStorage.removeItem('token'); setToken(null) })
       .finally(() => setLoading(false))
   }, [token])
 
-  const login = async (phone: string) => {
-    const r = await api.post('/auth/login/', { phone })
-    const { access, user: u } = r.data
-    localStorage.setItem('token', access)
-    setToken(access)
-    setUser(u)
+  const login = async (username: string, password: string) => {
+    const r = await api.post('/auth/jwt/create/', { username, password })
+    localStorage.setItem('token', r.data.access)
+    setToken(r.data.access)
+    const me = await api.get('/auth/users/me/')
+    setUser(me.data)
+  }
+
+  const register = async (data: RegisterData) => {
+    await api.post('/auth/users/', {
+      username: data.username,
+      email: data.email,
+      password: data.password,
+      re_password: data.password,
+      nickname: data.nickname,
+    })
   }
 
   const logout = () => {
@@ -48,7 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, token, login, register, logout, loading }}>
       {children}
     </AuthContext.Provider>
   )

@@ -3,31 +3,27 @@ from django.db import models
 
 
 class CustomUserManager(UserManager):
-    def _create_user(self, phone=None, password=None, **extra_fields):
-        if not phone:
-            raise ValueError('手机号必填')
-        user = self.model(phone=phone, **extra_fields)
+    def _create_user(self, username=None, email=None, password=None, **extra_fields):
+        if not username:
+            raise ValueError('账号必填')
+        user = self.model(username=username, email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_user(self, phone=None, password=None, **extra_fields):
+    def create_user(self, username=None, email=None, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', False)
         extra_fields.setdefault('is_superuser', False)
-        return self._create_user(phone, password, **extra_fields)
+        return self._create_user(username, email, password, **extra_fields)
 
-    def create_superuser(self, phone=None, password=None, **extra_fields):
+    def create_superuser(self, username=None, email=None, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
-        return self._create_user(phone, password, **extra_fields)
+        return self._create_user(username, email, password, **extra_fields)
 
 
 class User(AbstractUser):
-    username = None
-    email = None
-    first_name = None
-    last_name = None
-    phone = models.CharField('手机号', max_length=11, unique=True)
+    phone = models.CharField('手机号', max_length=20, blank=True, null=True, unique=True)
     nickname = models.CharField('昵称', max_length=50, blank=True, null=True)
     avatar_url = models.CharField('头像', max_length=255, blank=True, null=True)
     is_member = models.BooleanField('会员', default=False)
@@ -35,15 +31,15 @@ class User(AbstractUser):
 
     objects = CustomUserManager()
 
-    USERNAME_FIELD = 'phone'
-    REQUIRED_FIELDS = []
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['email']
 
     class Meta:
         verbose_name = '用户'
         verbose_name_plural = '用户'
 
     def __str__(self):
-        return self.nickname or self.phone
+        return self.nickname or self.username
 
 
 class SmsCode(models.Model):

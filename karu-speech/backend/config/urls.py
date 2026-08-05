@@ -10,10 +10,11 @@ FRONTEND_DIST = str(settings.BASE_DIR / 'frontend_dist')
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/auth/', include('users.urls_auth')),
+    path('api/auth/', include('djoser.urls')),
+    path('api/auth/', include('djoser.urls.jwt')),
     path('api/', include('lessons.urls')),
     path('api/practice/', include('practice.urls')),
     path('api/payment/', include('payment.urls')),
-    path('api/', include('users.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # Serve frontend build assets

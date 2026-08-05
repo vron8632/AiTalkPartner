@@ -8,8 +8,8 @@
 - 后端：Django 5.2 + Django REST Framework + SimpleUI
 - 数据库：MySQL（驱动 **pymysql**，`pymysql.install_as_MySQLdb()`），可视化工具 DBeaver-ce
 - API：DRF 书写，符合 RESTful 规范（资源操作用 ViewSet；动作类接口如上传/评价可用自定义端点）
-- 认证：**JWT** — djangorestframework-simplejwt（Bearer token，`/api/auth/login|refresh|me/`）
-- 用户模块：自定义 `users` app（非 djoser）
+- 认证：**JWT** — djangorestframework-simplejwt（Bearer token，`/api/auth/jwt/create|refresh/`）
+- 用户模块：**djoser** 完成用户注册登录（账号/密码/邮箱/昵称），`/api/auth/users/` 注册、`/api/auth/users/me/` 当前用户；保留 `/api/auth/login/` 旧手机号登录兼容
 
 ## 协作规则
 

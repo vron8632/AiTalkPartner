@@ -5,14 +5,14 @@ from users.models import User, SmsCode
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
-    list_display = ['id', 'phone', 'nickname', 'is_member', 'member_expire', 'date_joined']
+    list_display = ['id', 'username', 'nickname', 'is_member', 'member_expire', 'date_joined']
     list_filter = ['is_member', 'is_active']
-    search_fields = ['phone', 'nickname']
+    search_fields = ['username', 'nickname', 'phone', 'email']
     ordering = ['-date_joined']
 
     fieldsets = (
-        (None, {'fields': ('phone', 'password')}),
-        ('个人信息', {'fields': ('nickname', 'avatar_url')}),
+        (None, {'fields': ('username', 'password')}),
+        ('个人信息', {'fields': ('email', 'nickname', 'avatar_url', 'phone')}),
         ('会员信息', {'fields': ('is_member', 'member_expire')}),
         ('权限', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
         ('时间信息', {'fields': ('last_login', 'date_joined')}),
@@ -20,7 +20,7 @@ class UserAdmin(BaseUserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('phone', 'password1', 'password2'),
+            'fields': ('username', 'email', 'password1', 'password2'),
         }),
     )
 

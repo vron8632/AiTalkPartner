@@ -60,7 +60,7 @@ export function ProfilePage() {
             <User size={32} className="text-primary" />
           </div>
           <div className="flex-1">
-            <h2 className="text-xl font-bold text-text">{user.nickname || user.phone}</h2>
+            <h2 className="text-xl font-bold text-text">{user.nickname || user.username}</h2>
             <p className="text-sm text-text-muted">
               {user.is_member ? '🎯 会员' : '📖 免费用户'}
               {user.phone && ` · ${user.phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2')}`}

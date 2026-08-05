@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
+    'djoser',
     'users',
     'lessons',
     'practice',
@@ -116,6 +117,17 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
     'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
+DJOSER = {
+    # 手动在 UserCreateSerializer 中实现 re_password 校验
+    # （djoser 内置 retype 会绕过自定义序列化器，丢失 nickname 等扩展字段）
+    'USER_CREATE_PASSWORD_RETYPE': False,
+    'SERIALIZERS': {
+        'user_create': 'users.serializers.UserCreateSerializer',
+        'user': 'users.serializers.UserSerializer',
+        'current_user': 'users.serializers.UserSerializer',
+    },
 }
 
 CORS_ALLOW_ALL_ORIGINS = True
