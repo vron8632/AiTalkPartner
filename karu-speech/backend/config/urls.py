@@ -4,6 +4,9 @@ from django.contrib import admin
 from django.urls import path, include, re_path
 from django.views.generic import TemplateView
 from django.views.static import serve
+from rest_framework_simplejwt.views import TokenRefreshView
+
+from users import views as users_views
 
 FRONTEND_DIST = str(settings.BASE_DIR / 'frontend_dist')
 
@@ -11,7 +14,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/auth/', include('users.urls_auth')),
     path('api/auth/', include('djoser.urls')),
-    path('api/auth/', include('djoser.urls.jwt')),
+    # djoser.urls.jwt 的 jwt/create 换成带登录日志的视图
+    path('api/auth/jwt/create/', users_views.LoggingTokenObtainPairView.as_view(), name='jwt-create'),
+    path('api/auth/jwt/refresh/', TokenRefreshView.as_view(), name='jwt-refresh'),
     path('api/', include('lessons.urls')),
     path('api/practice/', include('practice.urls')),
     path('api/payment/', include('payment.urls')),

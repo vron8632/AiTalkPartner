@@ -2,6 +2,28 @@ from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
 
 
+class LoginLog(models.Model):
+    """用户登录日志（记录登录成功的时间/方式/IP）。"""
+    METHOD_CHOICES = [
+        ('password', '账号密码'),
+        ('email_code', '邮箱验证码'),
+        ('phone', '手机号'),
+    ]
+    user = models.ForeignKey('users.User', on_delete=models.CASCADE, verbose_name='用户', related_name='login_logs')
+    method = models.CharField('登录方式', max_length=20, choices=METHOD_CHOICES)
+    ip = models.GenericIPAddressField('IP地址', blank=True, null=True)
+    user_agent = models.CharField('浏览器UA', max_length=255, blank=True)
+    created_at = models.DateTimeField('登录时间', auto_now_add=True)
+
+    class Meta:
+        verbose_name = '登录日志'
+        verbose_name_plural = '登录日志'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.user} @ {self.created_at:%Y-%m-%d %H:%M}'
+
+
 class CustomUserManager(UserManager):
     def _create_user(self, username=None, email=None, password=None, **extra_fields):
         if not username:

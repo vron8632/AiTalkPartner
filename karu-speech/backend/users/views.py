@@ -6,11 +6,42 @@ from rest_framework import permissions
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenObtainPairView
 
-from users.models import User
+from users.models import User, LoginLog
 from users.serializers import UserSerializer
 
 ALLOWED_AVATAR_EXTS = {'.jpg', '.jpeg', '.png', '.gif', '.webp'}
+
+
+def _client_ip(request):
+    xff = request.META.get('HTTP_X_FORWARDED_FOR')
+    if xff:
+        return xff.split(',')[0].strip()
+    return request.META.get('REMOTE_ADDR')
+
+
+def record_login_log(user, method, request):
+    """记录一次登录成功日志。"""
+    LoginLog.objects.create(
+        user=user,
+        method=method,
+        ip=_client_ip(request),
+        user_agent=(request.META.get('HTTP_USER_AGENT') or '')[:255],
+    )
+
+
+class LoggingTokenObtainPairView(TokenObtainPairView):
+    """账号密码登录（djoser/simplejwt），成功后记录登录日志。"""
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        # simplejwt 把认证成功的用户挂在 serializer.user 上
+        user = getattr(serializer, 'user', None)
+        if user:
+            record_login_log(user, 'password', request)
+        return Response(serializer.validated_data, status=200)
 
 
 def _is_valid_image(head: bytes) -> bool:
@@ -35,6 +66,7 @@ def login(request):
         return Response({'detail': '请输入正确的手机号'}, status=400)
     user, _ = User.objects.get_or_create(phone=phone, defaults={'username': phone, 'email': f'{phone}@example.com'})
     refresh = RefreshToken.for_user(user)
+    record_login_log(user, 'phone', request)
     return Response({
         'access': str(refresh.access_token),
         'refresh': str(refresh),

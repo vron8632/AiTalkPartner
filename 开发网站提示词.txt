@@ -9,6 +9,10 @@
 -以专业技术标准沟通，直接给出精确答案
 -使用djoser完成用户模块的开发，采用JWT的认证方式
 
+Django 自己不会说 MySQL 的“方言”，需要装一个驱动：
+mysqlclient（推荐，C 实现，快）：pip install mysqlclient
+PyMySQL（纯 Python，慢点但好装）：pip install pymysql + 项目 __init__.py 里加 pymysql.install_as_MySQLdb()
+驱动干的事：把 Python 代码翻译成 MySQL 网络协议，通过 TCP/IP 连到 3306 端口发过去。
 
 我使用的是Vue前端+axios，运行在http://localhost:5173,后端是Django，接口运行在 http://localhost:8000，请通过django-cors-headers从后端解决浏览器的跨域问题；
 用户注册登录模块开发规则:使用djoser完成用户模块的开发，采用JWT的认证方式。

@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 
 from users.models import User
 from users.serializers import UserSerializer
+from users.views import record_login_log
 from e_mail import services
 
 
@@ -51,6 +52,7 @@ def login_by_code(request):
     except services.CodeInvalidError as e:
         return _error(str(e))
     refresh = RefreshToken.for_user(user)
+    record_login_log(user, 'email_code', request)
     return Response({
         'access': str(refresh.access_token),
         'refresh': str(refresh),

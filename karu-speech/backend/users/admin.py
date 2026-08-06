@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from users.models import User, SmsCode
+from users.models import User, SmsCode, LoginLog
 
 
 @admin.register(User)
@@ -30,3 +30,20 @@ class SmsCodeAdmin(admin.ModelAdmin):
     list_display = ['phone', 'code', 'used', 'expires_at', 'created_at']
     list_filter = ['used']
     search_fields = ['phone']
+
+
+@admin.register(LoginLog)
+class LoginLogAdmin(admin.ModelAdmin):
+    """登录日志（只读）。"""
+    list_display = ['user', 'method', 'ip', 'created_at']
+    list_filter = ['method', 'created_at']
+    search_fields = ['user__username', 'user__nickname', 'user__phone', 'ip']
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
