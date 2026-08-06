@@ -21,7 +21,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
               alt="logo"
               className="w-8 h-8 rounded-lg object-cover bg-white"
             />
-            <span className="font-bold text-base">宇涵智能演说</span>
+            <span className="font-bold text-base">言值AI</span>
           </Link>
 
           <div className="flex items-center gap-1">

@@ -1,6 +1,6 @@
 # AGENTS.md — 项目开发规则
 
-本项目为「AI宇涵智能口才陪练」(AiTalkPartner)。
+本项目为「言值AI - 智能口才陪练」(AiTalkPartner)。
 
 ## 技术栈（以项目代码为准）
 

@@ -102,7 +102,7 @@ def send_verify_code(email: str, purpose: str) -> None:
     code = generate_code(email, purpose)
     try:
         send_email(
-            subject='【宇涵智能演说】验证码',
+            subject='【言值AI】验证码',
             body=(
                 f'你的验证码是：{code}\n'
                 f'验证码 {CODE_TTL_MINUTES} 分钟内有效，请勿泄露给他人。'
