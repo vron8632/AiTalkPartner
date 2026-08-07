@@ -20,8 +20,10 @@ def _load_dotenv(path: Path) -> None:
 _load_dotenv(BASE_DIR / '.env')
 
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-dev-only-change-me')
-DEBUG = True
-ALLOWED_HOSTS = ['*']
+# 生产环境在 .env 中设置 DJANGO_DEBUG=False，避免泄露调试信息
+DEBUG = os.getenv('DJANGO_DEBUG', 'True') == 'True'
+# 生产环境在 .env 中配置域名（逗号分隔），如 DJANGO_ALLOWED_HOSTS=www.example.com,example.com
+ALLOWED_HOSTS = [h.strip() for h in os.getenv('DJANGO_ALLOWED_HOSTS', '*').split(',') if h.strip()]
 
 INSTALLED_APPS = [
     'simpleui',
