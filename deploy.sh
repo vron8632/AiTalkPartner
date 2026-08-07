@@ -29,13 +29,24 @@ if [ ! -f "$BACKEND_DIR/manage.py" ]; then
   echo "   请检查路径是否为后端代码目录（含 manage.py 的那一层）"
   exit 1
 fi
+
+# ---------- 自动检测/创建虚拟环境 ----------
 if [ ! -d "$VENV_DIR" ]; then
-  echo "❌ 未找到虚拟环境 $VENV_DIR"
-  echo "   请先在宝塔「网站 → Python 项目」添加项目："
-  echo "     项目路径: $BACKEND_DIR"
-  echo "     Python版本: 3.11.4 | 启动方式: Gunicorn | 端口: 8000"
-  echo "   添加后宝塔会自动创建 venv，再重新运行本脚本"
-  exit 1
+  echo "⚠️  未检测到虚拟环境，正在自动创建（需要 python3.11）..."
+  # 查找 python3.11，兼容宝塔 pyenv / 系统安装
+  PYTHON_BIN=""
+  for p in python3.11 python3.10 python3; do
+    if command -v "$p" >/dev/null 2>&1; then
+      PYTHON_BIN="$p"; break
+    fi
+  done
+  if [ -z "$PYTHON_BIN" ]; then
+    echo "❌ 未找到 Python3.11，无法自动创建虚拟环境"
+    echo "   请先在宝塔「软件商店」安装 Python 3.11，或手动创建 venv 后重试"
+    exit 1
+  fi
+  "$PYTHON_BIN" -m venv "$VENV_DIR"
+  echo "✅ 已用 $PYTHON_BIN 创建虚拟环境（$VENV_DIR）"
 fi
 
 PY="$VENV_DIR/bin/python"
